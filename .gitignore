@@ -4,14 +4,16 @@
 !*/
 # Don't ignore .gitignore, LICENSE and *.go files
 !.gitignore
-!.dockerignore
 !LICENSE
 !*.go
-!.travis.yml
 !Makefile
-!vendor/**
 !Dockerfile
-!example_bigip_exporter.yml
 !build.sh
-src
+!go.mod
+!go.sum
+!*.yaml
+!*.yml
 pkg
+src
+vendor
+dist

@@ -4,21 +4,22 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ExpressenAB/bigip_exporter/collector"
 	"github.com/ExpressenAB/bigip_exporter/config"
 	"github.com/juju/loggo"
 	"github.com/pr8kerl/f5er/f5"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-var (
-	logger = loggo.GetLogger("")
-)
+var logger = loggo.GetLogger("")
 
 func listen(exporterBindAddress string, exporterBindPort int) {
-	http.Handle("/metrics", prometheus.Handler())
+	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		//nolint:errcheck
 		w.Write([]byte(`<html>
 			<head><title>BIG-IP Exporter</title></head>
 			<body>
@@ -27,8 +28,11 @@ func listen(exporterBindAddress string, exporterBindPort int) {
 			</body>
 			</html>`))
 	})
-	exporterBind := exporterBindAddress + ":" + strconv.Itoa(exporterBindPort)
-	logger.Criticalf("Process failed: %s", http.ListenAndServe(exporterBind, nil))
+	server := &http.Server{
+		Addr:              exporterBindAddress + ":" + strconv.Itoa(exporterBindPort),
+		ReadHeaderTimeout: 10 * time.Second,
+	}
+	logger.Criticalf("Process failed: %s", server.ListenAndServe())
 }
 
 func main() {
