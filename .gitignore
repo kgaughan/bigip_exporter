@@ -8,10 +8,12 @@
 !*.go
 !Makefile
 !Dockerfile
-!example_bigip_exporter.yml
 !build.sh
 !go.mod
 !go.sum
+!*.yaml
+!*.yml
 pkg
 src
 vendor
+dist
