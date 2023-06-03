@@ -35,7 +35,9 @@ type Config struct {
 var logger = loggo.GetLogger("")
 
 func init() {
-	loggo.ConfigureLoggers("<root>=INFO")
+	if err := loggo.ConfigureLoggers("<root>=INFO"); err != nil {
+		panic(err)
+	}
 	registerFlags()
 	bindFlags()
 	bindEnvs()
@@ -47,7 +49,9 @@ func init() {
 
 	logLevel := viper.GetString("exporter.log_level")
 	if _, validLevel := loggo.ParseLevel(logLevel); validLevel {
-		loggo.ConfigureLoggers("<root>=" + strings.ToUpper(logLevel))
+		if err := loggo.ConfigureLoggers("<root>=" + strings.ToUpper(logLevel)); err != nil {
+			panic(err)
+		}
 		return
 	}
 
