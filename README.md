@@ -1,22 +1,25 @@
 # BIG-IP exporter
 Prometheus exporter for BIG-IP statistics. Uses iControl REST API.
 
+This is a maintenance fork of https://github.com/kgaughan/bigip_exporter.
+
 ## Get it
-The latest version is 1.0.0. All releases can be found under [Releases](https://github.com/ExpressenAB/bigip_exporter/releases) and docker images are available at [Docker Hub](https://hub.docker.com/r/expressenab/bigip_exporter/tags/)(Thanks to [0x46616c6b](https://github.com/0x46616c6b)).
+
+The latest version is 1.1.0. All releases can be found under [Releases](https://github.com/kgaughan/bigip_exporter/releases) and docker images are available on the GitHub Container Registry.
 
 ## Usage
 The bigip_exporter is easy to use. Example:
-```
+```sh
 ./bigip_exporter --bigip.host <bigip-host> --bigip.port 443 --bigip.username admin --bigip.password admin
 ```
 
 Alternatively, passing a configuration file:
-```
+```sh
 ./bigip_exporter --bigip.host <bigip-host> --bigip.port 443 --exporter.config my_config_file.yml
 ```
 
 Or, using environment variables to pass you parameters
-```
+```sh
 export BE_BIGIP_HOST=<bigip-host>
 export BE_BIGIP_PORT=443
 export BE_EXPORTER_BIND_PORT=
@@ -25,8 +28,8 @@ export BE_EXPORTER_BIND_PORT=
 
 ### Docker
 The bigip_exporter is also available as a docker image.
-```
-docker run -p 9142:9142 expressenab/bigip_exporter --bigip.host <bigip-host> --bigip.port 443 --bigip.username admin --bigip.password admin
+```sh
+docker run -p 9142:9142 kgaughan/bigip_exporter --bigip.host <bigip-host> --bigip.port 443 --bigip.username admin --bigip.password admin
 ```
 
 ### Parameters
@@ -70,7 +73,7 @@ exporter.namespace | BE_EXPORTER_NAMESPACE
 exporter.debug | BE_EXPORTER_DEBUG
 
 #### Configuration file
-Take a look at this [example configuration file](https://github.com/ExpressenAB/bigip_exporter/blob/master/example_bigip_exporter.yml)
+Take a look at this [example configuration file](https://github.com/kgaughan/bigip_exporter/blob/master/example_bigip_exporter.yml)
 
 ## Implemented metrics
 * Virtual Server
@@ -87,14 +90,14 @@ Currently only version 12.0.0 and 12.1.1 are tested. If you experience any probl
 ## Building
 ### Building locally
 This project uses [Go modules](https://blog.golang.org/using-go-modules).
-```
+```sh
 git clone git@github.com:kgaughan/bigip_exporter.git
 cd bigip_exporter
 go build .
 ```
 ### Cross compilation
 Go offers possibility to cross compile the application for different use on a different OS and architecture. This is achieved by setting the environment valiables `GOOS` and `GOARCH`. If you for example want to build for linux on an amd64 architecture the `go build` step can be replaced with the following:
-```
+```sh
 GOOS=linux GOARCH=amd64 go build .
 ```
 A list of available options for `GOOS` and `GOARCH` is available in the [documentation](https://golang.org/doc/install/source#environment)
