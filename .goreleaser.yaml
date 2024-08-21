@@ -1,7 +1,10 @@
 ---
+version: 2
+
 before:
   hooks:
     - go mod tidy
+    - go mod download
 
 builds:
   - env:
@@ -16,6 +19,7 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
+    mod_timestamp: "{{ .CommitTimestamp }}"
     tags:
       - netgo
 
@@ -37,8 +41,33 @@ archives:
       - LICENSE
       - README.md
 
+nfpms:
+  - id: packages
+    file_name_template: >-
+      {{ .PackageName }}-{{ .Version }}.
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "arm64" }}aarch64
+      {{- else }}{{ .Arch }}{{ end }}
+    description: |-
+      Prometheus exporter for BIG-IP statistics.
+    homepage: "https://github.com/kgaughan/bigip_exporter"
+    maintainer: "Keith Gaughan <k+bigip@stereochro.me>"
+    bindir: /usr/sbin
+    license: MIT
+    formats:
+      - rpm
+
+dockers:
+  - image_templates:
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE }}:{{ .Tag }}"
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE }}:latest"
+    skip_push: auto
+    use: buildx
+    dockerfile: Dockerfile
+
 checksum:
-  name_template: "checksums.txt"
+  algorithm: sha256
+  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
 
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
