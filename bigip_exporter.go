@@ -18,7 +18,7 @@ var logger = loggo.GetLogger("")
 
 func listen(exporterBindAddress string, exporterBindPort int) {
 	http.Handle("/metrics", promhttp.Handler())
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		//nolint:errcheck
 		w.Write([]byte(`<html>
 			<head><title>BIG-IP Exporter</title></head>
