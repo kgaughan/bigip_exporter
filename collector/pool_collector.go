@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"log/slog"
 	"strings"
 	"time"
 
@@ -350,7 +351,7 @@ func (c *PoolCollector) Collect(ch chan<- prometheus.Metric) {
 	err, allPoolStats := c.bigip.ShowAllPoolStats()
 	if err != nil {
 		c.collectorScrapeStatus.WithLabelValues("pool").Set(0)
-		logger.Warningf("Failed to get statistics for pools")
+		slog.Warn("Failed to get statistics for pools")
 	} else {
 		for key, poolStats := range allPoolStats.Entries {
 			keyParts := strings.Split(key, "/")
@@ -374,14 +375,14 @@ func (c *PoolCollector) Collect(ch chan<- prometheus.Metric) {
 			}
 		}
 		c.collectorScrapeStatus.WithLabelValues("pool").Set(0)
-		logger.Debugf("Successfully fetched statistics for pools")
+		slog.Debug("Successfully fetched statistics for pools")
 	}
 
 	elapsed := time.Since(start)
 	c.collectorScrapeDuration.WithLabelValues("pool").Observe(elapsed.Seconds())
 	c.collectorScrapeStatus.Collect(ch)
 	c.collectorScrapeDuration.Collect(ch)
-	logger.Debugf("Getting pool statistics took %s", elapsed)
+	slog.Debug("Pool statistics fetched", "elapsed", elapsed)
 }
 
 // Describe describes the metrics exported from this collector.

@@ -1,10 +1,10 @@
 package collector
 
 import (
+	"log/slog"
 	"sync"
 	"time"
 
-	"github.com/juju/loggo"
 	"github.com/pr8kerl/f5er/f5"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -14,8 +14,6 @@ type BigipCollector struct {
 	collectors          map[string]prometheus.Collector
 	totalScrapeDuration prometheus.Summary
 }
-
-var logger = loggo.GetLogger("")
 
 // NewBigipCollector returns a collector that wraps all the collectors.
 func NewBigipCollector(bigip *f5.Device, namespace string, partitionsList []string) (*BigipCollector, error) {
@@ -57,7 +55,7 @@ func (c *BigipCollector) Collect(ch chan<- prometheus.Metric) {
 	elapsed := time.Since(start)
 	c.totalScrapeDuration.Observe(elapsed.Seconds())
 	ch <- c.totalScrapeDuration
-	logger.Debugf("Total collection time was: %s", elapsed)
+	slog.Debug("Collection complete", "elapsed", elapsed)
 }
 
 // Describe describes all metrics exported by this exporter by delegating

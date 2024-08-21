@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -8,13 +9,10 @@ import (
 
 	"github.com/ExpressenAB/bigip_exporter/collector"
 	"github.com/ExpressenAB/bigip_exporter/config"
-	"github.com/juju/loggo"
 	"github.com/pr8kerl/f5er/f5"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
-
-var logger = loggo.GetLogger("")
 
 func listen(exporterBindAddress string, exporterBindPort int) {
 	http.Handle("/metrics", promhttp.Handler())
@@ -32,12 +30,12 @@ func listen(exporterBindAddress string, exporterBindPort int) {
 		Addr:              exporterBindAddress + ":" + strconv.Itoa(exporterBindPort),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
-	logger.Criticalf("Process failed: %s", server.ListenAndServe())
+	slog.Error("Process failed", "error", server.ListenAndServe())
 }
 
 func main() {
 	config := config.GetConfig()
-	logger.Debugf("Config: %v", config)
+	slog.Debug("Config", "contents", config)
 
 	bigipEndpoint := config.Bigip.Host + ":" + strconv.Itoa(config.Bigip.Port)
 	var exporterPartitionsList []string

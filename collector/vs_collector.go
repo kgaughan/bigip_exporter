@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"log/slog"
 	"strings"
 	"time"
 
@@ -482,7 +483,7 @@ func (c *VSCollector) Collect(ch chan<- prometheus.Metric) {
 	err, allVirtualServerStats := c.bigip.ShowAllVirtualStats()
 	if err != nil {
 		c.collectorScrapeStatus.WithLabelValues("vs").Set(0)
-		logger.Warningf("Failed to get statistics for virtual servers")
+		slog.Warn("Failed to get statistics for virtual servers")
 	} else {
 		for key, virtualStats := range allVirtualServerStats.Entries {
 			keyParts := strings.Split(key, "/")
@@ -506,14 +507,14 @@ func (c *VSCollector) Collect(ch chan<- prometheus.Metric) {
 			}
 		}
 		c.collectorScrapeStatus.WithLabelValues("vs").Set(1)
-		logger.Debugf("Successfully fetched statistics for virtual servers")
+		slog.Debug("Successfully fetched statistics for virtual servers")
 	}
 
 	elapsed := time.Since(start)
 	c.collectorScrapeDuration.WithLabelValues("vs").Observe(elapsed.Seconds())
 	c.collectorScrapeStatus.Collect(ch)
 	c.collectorScrapeDuration.Collect(ch)
-	logger.Debugf("Getting virtual server statistics took %s", elapsed)
+	slog.Debug("Virtual server statistics fetched", "elapsed", elapsed)
 }
 
 // Describe describes the metrics exported from this collector.

@@ -1,10 +1,10 @@
 package config
 
 import (
+	"log/slog"
 	"os"
 	"strings"
 
-	"github.com/juju/loggo"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -32,12 +32,7 @@ type Config struct {
 	Exporter exporterConfig `yaml:"exporter"`
 }
 
-var logger = loggo.GetLogger("")
-
 func init() {
-	if err := loggo.ConfigureLoggers("<root>=INFO"); err != nil {
-		panic(err)
-	}
 	registerFlags()
 	bindFlags()
 	bindEnvs()
@@ -48,14 +43,26 @@ func init() {
 	}
 
 	logLevel := viper.GetString("exporter.log_level")
-	if _, validLevel := loggo.ParseLevel(logLevel); validLevel {
-		if err := loggo.ConfigureLoggers("<root>=" + strings.ToUpper(logLevel)); err != nil {
-			panic(err)
-		}
-		return
+	if levelCode, validLevel := parseLevel(logLevel); validLevel {
+		slog.SetLogLoggerLevel(levelCode)
+	} else {
+		slog.Warn("Invalid log level: using info")
 	}
+}
 
-	logger.Warningf("Invalid log level - Using info")
+func parseLevel(level string) (slog.Level, bool) {
+	switch level {
+	case "debug":
+		return slog.LevelDebug, true
+	case "info":
+		return slog.LevelInfo, true
+	case "warn":
+		return slog.LevelWarn, true
+	case "error":
+		return slog.LevelError, true
+	default:
+		return slog.LevelInfo, false
+	}
 }
 
 func registerFlags() {
@@ -76,7 +83,7 @@ func bindFlags() {
 	flag.VisitAll(func(f *flag.Flag) {
 		err := viper.BindPFlag(f.Name, f)
 		if err != nil {
-			logger.Warningf("Failed to bind flag (%s)", err)
+			slog.Warn("Failed to bind flag", "error", err)
 		}
 	})
 }
@@ -88,18 +95,19 @@ func bindEnvs() {
 	flag.VisitAll(func(f *flag.Flag) {
 		err := viper.BindEnv(f.Name)
 		if err != nil {
-			logger.Warningf("Failed to bind environment variable BE_%s (%s)", strings.ToUpper(strings.ReplaceAll(f.Name, ".", "_")), err)
+			varName := "BE_" + strings.ToUpper(strings.ReplaceAll(f.Name, ".", "_"))
+			slog.Warn("Failed to bind environment variable", "var", varName, "error", err)
 		}
 	})
 }
 
 func readConfigFile(fileName string) {
 	if file, err := os.Open(fileName); err != nil {
-		logger.Warningf("Failed to open configuration file (%s)", err)
+		slog.Warn("Failed to open configuration file", "error", err)
 	} else {
 		viper.SetConfigType("yaml")
 		if err = viper.ReadConfig(file); err != nil {
-			logger.Warningf("Failed to read configuration file (%s)", err)
+			slog.Warn("Failed to read configuration file", "error", err)
 		}
 	}
 }
