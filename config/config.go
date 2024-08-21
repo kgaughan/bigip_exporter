@@ -43,11 +43,12 @@ func init() {
 	}
 
 	logLevel := viper.GetString("exporter.log_level")
-	if levelCode, validLevel := parseLevel(logLevel); validLevel {
-		slog.SetLogLoggerLevel(levelCode)
-	} else {
+	levelCode, validLevel := parseLevel(logLevel)
+	if !validLevel {
 		slog.Warn("Invalid log level: using info")
 	}
+	h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: levelCode})
+	slog.SetDefault(slog.New(h))
 }
 
 func parseLevel(level string) (slog.Level, bool) {
