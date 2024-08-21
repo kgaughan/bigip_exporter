@@ -3,7 +3,6 @@ module github.com/ExpressenAB/bigip_exporter
 go 1.21
 
 require (
-	github.com/juju/loggo v1.0.0
 	github.com/pr8kerl/f5er v0.3.2
 	github.com/prometheus/client_golang v1.20.1
 	github.com/spf13/pflag v1.0.5

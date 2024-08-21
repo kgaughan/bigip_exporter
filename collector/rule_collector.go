@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"log/slog"
 	"strings"
 	"time"
 
@@ -143,7 +144,7 @@ func (c *RuleCollector) Collect(ch chan<- prometheus.Metric) {
 	err, allRuleStats := c.bigip.ShowAllRuleStats()
 	if err != nil {
 		c.collectorScrapeStatus.WithLabelValues("rule").Set(0)
-		logger.Warningf("Failed to get statistics for rules")
+		slog.Warn("Failed to get statistics for rules")
 	} else {
 		for key, ruleStats := range allRuleStats.Entries {
 			keyParts := strings.Split(key, "/")
@@ -169,14 +170,14 @@ func (c *RuleCollector) Collect(ch chan<- prometheus.Metric) {
 			}
 		}
 		c.collectorScrapeStatus.WithLabelValues("rule").Set(1)
-		logger.Debugf("Successfully fetched statistics for rules")
+		slog.Debug("Successfully fetched statistics for rules")
 	}
 
 	elapsed := time.Since(start)
 	c.collectorScrapeDuration.WithLabelValues("rule").Observe(elapsed.Seconds())
 	c.collectorScrapeStatus.Collect(ch)
 	c.collectorScrapeDuration.Collect(ch)
-	logger.Debugf("Getting rule stats took %s", elapsed)
+	slog.Debug("Rule stats fetched", "elapsed", elapsed)
 }
 
 // Describe describes the metrics exported from this collector.
