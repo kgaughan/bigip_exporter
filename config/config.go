@@ -94,9 +94,8 @@ func bindEnvs() {
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
 	flag.VisitAll(func(f *flag.Flag) {
-		err := viper.BindEnv(f.Name)
-		if err != nil {
-			varName := "BE_" + strings.ToUpper(strings.ReplaceAll(f.Name, ".", "_"))
+		if err := viper.BindEnv(f.Name); err != nil {
+			varName := "BE_" + strings.ToUpper(replacer.Replace(f.Name))
 			slog.Warn("Failed to bind environment variable", "var", varName, "error", err)
 		}
 	})
