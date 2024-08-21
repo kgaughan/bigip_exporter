@@ -34,4 +34,8 @@ jobs:
           only-new-issues: true
 
       - name: Build
-        run: CGO_ENABLED=0 go build -tags netgo -trimpath -ldflags '-s -w' -o bigip_exporter .
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: build --snapshot --clean
