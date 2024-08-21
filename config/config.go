@@ -57,7 +57,7 @@ func parseLevel(level string) (slog.Level, bool) {
 		return slog.LevelDebug, true
 	case "info":
 		return slog.LevelInfo, true
-	case "warn":
+	case "warning":
 		return slog.LevelWarn, true
 	case "error":
 		return slog.LevelError, true
@@ -77,7 +77,7 @@ func registerFlags() {
 	flag.String("exporter.partitions", "", "A comma separated list of partitions which to export. (default: all)")
 	flag.String("exporter.config", "", "bigip_exporter configuration file name.")
 	flag.String("exporter.namespace", "bigip", "bigip_exporter namespace.")
-	flag.String("exporter.log_level", "info", "Available options are trace, debug, info, warning, error and critical")
+	flag.String("exporter.log_level", "info", "Available options are debug, info, warning, and error")
 }
 
 func bindFlags() {
