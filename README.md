@@ -28,7 +28,7 @@ export BE_EXPORTER_BIND_PORT=
 ### Docker
 The bigip_exporter is also available as a docker image.
 ```sh
-docker run -p 9142:9142 kgaughan/bigip_exporter --bigip.host <bigip-host> --bigip.port 443 --bigip.username admin --bigip.password admin
+docker run -p 9142:9142 ghcr.io/kgaughan/bigip_exporter:latest --bigip.host <bigip-host> --bigip.port 443 --bigip.username admin --bigip.password admin
 ```
 
 ### Parameters
